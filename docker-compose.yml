@@ -3,12 +3,8 @@ services:
     image: postgres:16
     container_name: tradesim-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tradinggame
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: yourpassword
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: your-super-secret-key-that-is-long-enough-for-hs256
-      JWT_EXPIRATION: 604800000
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -20,21 +16,22 @@ services:
       retries: 5
 
   backend:
-      build:
-        context: C:/Users/poina/IdeaProjects/tradesim
-      container_name: tradesim-backend
-      ports:
-        - "8080:8080"
-      environment:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tradinggame
-        SPRING_DATASOURCE_USERNAME: postgres
-        SPRING_DATASOURCE_PASSWORD: yourpassword
-        JWT_SECRET: your-super-secret-key-that-is-long-enough-for-hs256
-        JWT_EXPIRATION: 604800000
-      depends_on:
-        db:
-          condition: service_healthy
-      restart: on-failure
+    build:
+      context: C:/Users/poina/IdeaProjects/tradesim
+    container_name: tradesim-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
 
   frontend:
     build:
